@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huibo.issue.dao.IIssueRoleDao">
+	
+	<select id="getDate" resultType="com.huibo.issue.bo.IIssueRoleBO">
+		select
+			u.USER_ID userId,u.USER_NAME userName,r.ROLE_NAME roleName,r.ROLE_CODE roleCode
+		from 
+			INFO_ISSUE_PROJECT p,
+			I_ISSUE_PROJECT_ROLE_REL c,
+			I_ISSUE_ROLE r,sys_user u
+		where 
+			p.PROJECT_ID = c.PROJECT_ID and 
+			c.ROLE_CODE =r.ROLE_CODE and
+			c.USER_ID = u.USER_ID and 
+			p.PROJECT_ID = #{pid}
+	</select>
+
+	<select id="getDateByRoleId" resultType="com.huibo.issue.bo.IIssueRoleBO">
+		select
+			u.USER_ID userId,u.USER_NAME userName,r.ROLE_NAME roleName,r.ROLE_CODE roleCode
+		from 
+			INFO_ISSUE_PROJECT p,
+			I_ISSUE_PROJECT_ROLE_REL c,
+			I_ISSUE_ROLE r,sys_user u
+		where 
+			p.PROJECT_ID = c.PROJECT_ID and 
+			c.ROLE_CODE =r.ROLE_CODE and
+			c.USER_ID = u.USER_ID and 
+			p.PROJECT_ID = #{pid} and
+			u.USER_ID = #{uid}
+	</select>
+	
+	<insert id="addRoleInfo">
+	insert into 
+		I_ISSUE_PROJECT_ROLE_REL(PROJECT_ID,USER_ID,ROLE_CODE)
+	values(
+		#{protectId},
+		#{userId},
+		#{roleCode}
+		<!-- (SELECT USER_ID from sys_user where USER_NAME = ),
+		(SELECT ROLE_CODE from I_ISSUE_ROLE where ROLE_NAME = ) -->
+	)
+	</insert>
+	
+	
+	<delete id="removeRoleInfo">
+		delete from 
+			I_ISSUE_PROJECT_ROLE_REL 
+		where 
+			PROJECT_ID = #{protectId} and USER_ID = #{userId}
+	</delete>
+	
+	
+	<select id="findUserName" resultType="com.huibo.issue.bo.IIssueRoleBO">
+		select
+			u.USER_ID userId,u.USER_NAME userName
+		from 
+			sys_user u
+	</select>
+	
+	<select id="findRoleName" resultType="com.huibo.issue.bo.IIssueRoleBO">
+		select
+			r.ROLE_NAME roleName,r.ROLE_CODE roleCode
+		from 
+			I_ISSUE_ROLE r
+	</select>
+</mapper>

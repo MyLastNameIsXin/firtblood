@@ -1,0 +1,90 @@
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.huibo.issue.dao.IssueTypeDao">
+ 	<select id="queryIssueType" resultType="com.huibo.issue.bo.IssueTypeBo">
+ 		select 
+ 			Type_CODE typeCode,
+ 			Type_DESC typeDesc,
+ 			MODULE_STATE moduleState,
+ 			CREATE_BY createBy,
+ 			CREATE_TIME createTime,
+ 			MODIFY_BY modifyBy,
+ 			MODIFY_TIME modifyTime
+ 		from I_ISSUE_Type
+ 		<where>
+ 			<if test="params.bo.typeCode != null">
+ 				Type_CODE like #{params.bo.typeCode}
+ 			</if>
+ 			<if test="params.bo.typeDesc !=null ">
+ 				and Type_DESC like #{params.bo.typeDesc}
+ 			</if>
+ 			<if test="params.bo.moduleState != null">
+ 				and MODULE_STATE like #{params.bo.moduleState}
+ 			</if>
+ 			<if test="params.bo.createBy != null">
+ 				and CREATE_BY like #{params.bo.createBy}
+ 			</if>
+ 			<if test="params.bo.createTime">
+ 				and CREATE_TIME like #{params.bo.createTime}
+ 			</if>
+ 			<if test="params.bo.modifyBy != null">
+ 				and CREATE_BY like #{params.bo.modifyBy}
+ 			</if>
+ 			<if test="params.bo.modifyTime">
+ 				and CREATE_TIME like #{params.bo.modifyTime}
+ 			</if>
+ 		</where>
+ 	</select>
+ 	
+ 	<select id="checkedInfo" resultType="int">
+ 		select count(*) from I_ISSUE_Type where Type_CODE = #{param1}
+ 	</select>
+ 	
+ 
+ 	<insert id="addOneType">
+		insert into 
+			I_ISSUE_Type(Type_CODE,Type_DESC,MODULE_STATE,CREATE_BY,CREATE_TIME,MODIFY_BY,MODIFY_TIME)
+		values (#{typeCode},#{typeDesc},#{moduleState},#{createBy},#{createTime},#{modifyBy},#{modifyTime})
+	</insert>
+ 	
+ 	<delete id="deleteTypeByCode">
+		delete from
+			I_ISSUE_Type
+		where
+			Type_CODE = " "
+			<if test="array.length>0">
+		or 
+					 Type_CODE
+		in
+			<foreach item="item" index="index" collection="array"
+ 					open="(" separator="," close=")">
+ 						#{item}
+ 			</foreach>
+			</if>
+	</delete>
+	
+ 	<update id="modifyTypeByCode">
+		update
+				I_ISSUE_TYPE
+		set
+			TYPE_CODE = #{param1.typeCode},
+			TYPE_DESC = #{param1.typeDesc},
+			MODIFY_BY = #{param1.modifyBy},
+			MODIFY_TIME = #{param1.modifyTime}
+		where
+			TYPE_CODE = #{param2}
+	</update>
+	
+	<update id="modifyTypeModulestateByCode">
+		update
+				I_ISSUE_TYPE
+		set
+			MODULE_STATE = #{moduleState},
+			MODIFY_BY = #{modifyBy},
+			MODIFY_TIME = #{modifyTime}
+		where
+			TYPE_CODE = #{typeCode}
+	</update> 
+ </mapper>

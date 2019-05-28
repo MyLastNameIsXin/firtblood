@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huibo.issue.dao.ProjectDao">
+	
+	<!-- 显示角色信息 -->
+	<select id="queryAllRole" resultType="com.huibo.issue.po.IssueRolePo">
+		SELECT 
+			a.ROLE_CODE roleCode,
+			a.ROLE_NAME roleName,
+			GROUP_CONCAT(c.STATE_DESC) canDo,
+			a.MODULE_STATE moduleState
+		from
+			I_ISSUE_ROLE AS a LEFT JOIN I_ISSUE_ROLE_STATE_REL AS b ON a.ROLE_CODE = b.ROLE_CODE
+			LEFT JOIN I_ISSUE_STATE AS c ON c.STATE_CODE=b.ISSUE_STATE
+		where 
+			c.MODULE_STATE LIKE'1'
+		GROUP BY
+			a.ROLE_CODE
+			<if test="params.bo.sort != null and params.bo.sort != ''">
+				order by ${params.bo.sort}
+				<if test="params.bo.order != null and params.bo.order != ''">
+					 ${params.bo.order}
+				</if>
+			</if>
+	</select>
+	<!-- 查询一条角色信息，条件是角色编码 -->
+	<select id="queryRole" resultType="com.huibo.issue.po.IssueRolePo">
+			SELECT 
+			a.ROLE_CODE roleCode,
+			a.ROLE_NAME roleName,
+			GROUP_CONCAT(c.STATE_DESC) canDo,
+			a.MODULE_STATE moduleState
+		from
+			I_ISSUE_ROLE AS a LEFT JOIN I_ISSUE_ROLE_STATE_REL AS b ON a.ROLE_CODE = b.ROLE_CODE
+			LEFT JOIN I_ISSUE_STATE AS c ON c.STATE_CODE=b.ISSUE_STATE
+		where 
+			c.MODULE_STATE LIKE'1'
+		and
+			a.ROLE_CODE=#{roleCode}
+	</select>
+	<!-- 新增修改面板复选框部分 -->
+	<select id="operability" resultType="com.huibo.issue.po.IssueStatePo">
+		SELECT 
+			STATE_CODE sateCode,
+			STATE_DESC stateDesc
+		FROM 
+			I_ISSUE_STATE 
+		WHERE 
+			MODULE_STATE LIKE'1'
+	</select>
+	<!-- 增加角色信息 -->
+	<insert id="addRole">
+	INSERT INTO 
+	I_ISSUE_ROLE(
+		ROLE_CODE,
+		ROLE_NAME,
+		MODULE_STATE,
+		CREATE_BY,
+		CREATE_TIME,
+		MODIFY_BY,
+		MODIFY_TIME
+		)
+	VALUES
+		(#{param1},#{param2},'1',#{param3},NOW(),#{param3},NOW())
+	</insert>
+	<!-- 新增角色信息和缺陷状态关联表 -->
+	<insert id="addRele">
+		insert 
+		into 
+			I_ISSUE_ROLE_STATE_REL (ROLE_CODE,ISSUE_STATE)
+		values
+		<foreach collection="param2" item="aa" separator=",">
+			(#{param1},#{aa})
+		</foreach>
+	</insert>
+	<!-- 删除角色信息 -->
+	<delete id="removeRole">
+		delete 
+		from 
+			I_ISSUE_ROLE
+		where
+			ROLE_CODE 
+		in
+		<foreach collection="array" item="role"
+		open="(" close=")" separator=",">
+			#{role}
+		</foreach>
+	</delete>
+	<!-- 删除关联表信息 -->
+	<delete id="removeRele">
+		delete 
+		from 
+			I_ISSUE_ROLE_STATE_REL 
+		where
+			ROLE_CODE
+		in
+		<foreach collection="array" item="role"
+		open="(" close=")" separator=",">
+			#{role}
+		</foreach>
+	</delete>
+	<!-- 启用禁用角色信息 -->
+	<update id="starFor">
+		update 
+			I_ISSUE_ROLE
+		set
+			MODULE_STATE=#{param2},
+			MODIFY_BY=#{param3},
+			MODIFY_TIME=NOW()
+		where
+			ROLE_CODE=#{param1}
+	</update>
+	<!-- 修改角色信息表 -->
+	<update id="modifierRole">
+		update 
+			I_ISSUE_ROLE
+		set
+			ROLE_NAME=#{param2},
+			MODIFY_BY=#{param3},
+			MODIFY_TIME=NOW()
+		where
+			ROLE_CODE=#{param1}
+	</update>
+	<!-- 验证用户编号是否存在 -->
+	<!-- <select id="erifyRoleCode1" parameterType="com.huibo.issue.bo.ProjectRolesBo" resultType="Integer">
+		select
+			count(ROLE_CODE)
+		from
+			I_ISSUE_ROLE
+		where
+			ROLE_CODE=#{roleCode}
+	</select> -->
+	
+	<select id="erifyRoleCode" parameterType="com.huibo.issue.bo.ProjectRolesBo" resultType="Integer">
+		select
+			count(*)
+		from
+			I_ISSUE_ROLE
+		where
+			ROLE_CODE=#{roleCode}
+	</select>
+	<!-- 验证用户编号是否存在 -->
+	<select id="erifyRoleName" parameterType="com.huibo.issue.bo.ProjectRolesBo" resultType="Integer">
+		select
+			count(ROLE_NAME)
+		from
+			I_ISSUE_ROLE
+		where
+			ROLE_NAME=#{roleName}
+	</select>
+</mapper>

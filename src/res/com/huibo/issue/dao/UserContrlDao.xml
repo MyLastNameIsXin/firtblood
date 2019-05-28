@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huibo.issue.dao.UserContrlDao">
+	
+	<select id="getAllUserContrl" resultType="com.huibo.issue.po.UserContrlPo" parameterType="com.bn.javax.dao.Page" >
+		select
+			USER_ID  "userId",
+			USER_NAME  "userName",
+			GENDER_ID  "genderId",
+			MOBILE  "mobile",
+			EMAIL  "email"
+		from sys_user 	
+ 		<where>
+			<if test="params.bo.keyWord != null and params.bo.keyWord != ''">
+				user_id like '%${params.bo.keyWord}%' or 
+				user_name like '%${params.bo.keyWord}%'
+			</if>
+		</where> 
+	</select>
+	
+	<!--新增用户  -->
+	 <insert id="addUserContrl" parameterType="com.huibo.issue.bo.UserContrlBo" >
+		insert into sys_user(
+			USER_ID,
+			USER_NAME,
+			PASSWORD,
+			GENDER_ID,			
+			MOBILE,
+			EMAIL
+		)
+		values(
+			#{userId},
+			#{userName},
+			#{password},
+			#{genderId},
+			#{mobile},
+			#{email}
+		)
+	</insert> 
+	
+	<!-- 修改系统用户基本信息 -->
+	<update id="modifUserContrl" parameterType="com.huibo.issue.bo.UserContrlBo">
+		update sys_user
+		set
+			user_name = #{userName},
+			password = #{password},
+			gender_id = #{genderId},
+			mobile = #{mobile},
+			email = #{email}
+		where user_id = #{userId}
+	</update>
+	
+	<!-- 删除选中的用户管理 -->
+	<delete id="deleteUserContrl">
+		delete from sys_user where USER_ID in 
+		<foreach collection="array" item="userId" 
+			open="(" close=")" separator=",">
+			#{userId}
+		</foreach>
+	</delete>
+	
+	<!-- 验证表单的登录名称 -->
+	<select id="verifyUserId" resultType="int"  >
+		select	count(*) 
+		from sys_user 	
+		where user_id = #{userId}
+		
+	</select>
+
+</mapper>

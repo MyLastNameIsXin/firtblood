@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huibo.issue.dao.DefectListsDao">
+<!-- 查询当前用户参数过的项目用于生成下拉列表 -->
+	<select id="queryItemName" resultType="com.huibo.issue.po.InfoIssueProjectPO">
+		select
+			PROJECT_ID projectId,
+			PROJECT_NAME projectName
+		from
+			INFO_ISSUE_PROJECT
+		where
+			PROJECT_ID
+		in
+		(
+			select
+				PROJECT_ID
+			from
+				I_ISSUE_PROJECT_ROLE_REL
+			where
+				USER_ID=#{parm1}
+		)
+	</select>
+<!-- 查询可用的状态信息 -->
+	<select id="queryState" resultType="com.huibo.issue.po.IssueStatePo">
+		select 
+			STATE_CODE sateCode,
+			STATE_DESC stateDesc
+		from
+			I_ISSUE_STATE
+		where
+			MODULE_STATE='1'
+	</select>
+<!-- 查询当前用户是测试人员的项目名称 -->
+ 	<select id="queryItemData" resultType="com.huibo.issue.po.InfoIssueProjectPO">
+	SELECT
+		c.PROJECT_ID projectId,
+		c.PROJECT_NAME projectName
+	FROM
+		I_ISSUE_ROLE AS a LEFT JOIN I_ISSUE_PROJECT_ROLE_REL AS b ON a.ROLE_CODE = b.ROLE_CODE
+		LEFT JOIN INFO_ISSUE_PROJECT AS c ON c.PROJECT_ID=b.PROJECT_ID
+	WHERE
+		b.USER_ID=#{parm1}
+	AND
+		a.ROLE_CODE="004"
+	</select>
+	<!-- 查询新增面板中的缺陷分类 -->
+	<select id="itemDefect" resultType="com.huibo.issue.po.IssueTypePo">
+		select
+			TYPE_CODE typeCode,
+			TYPE_DESC typeDesc
+		from
+			I_ISSUE_TYPE
+		where
+			MODULE_STATE='1'
+	</select>
+	<!-- 查询新增面板中的严重程度 -->
+	<select id="itemDegree" resultType="com.huibo.issue.po.IssueSeverityPo">
+		select
+			SEVERITY_CODE severityCode,
+			SEVERITY_DESC severityDesc
+		from
+			I_ISSUE_SEVERITY
+		where
+			MODULE_STATE='1'
+	</select>
+	<!-- 查询新增修改面板中的优先级下拉 -->
+	<select id="itemPriority" resultType="com.huibo.issue.po.IssuePriorityPo">
+		select
+			PRIORITY_CODE priorityCode,
+			PRIORITY_DESC priorityDesc
+		from
+			I_ISSUE_PRIORITY
+		where
+			MODULE_STATE='1'
+	</select>
+	<!-- 添加面板父级缺陷下拉 -->
+	<select id="itemaParentFlaw" resultType="com.huibo.issue.po.IssueBaseInfoPo">
+		select
+			ISSUE_ID issueId,
+			ISSUE_NAME issueName
+		from
+			I_ISSUE_BASE_INFO
+		where
+			PROJECT_ID=#{projectId}
+	</select>
+	<!-- 增加一条缺陷记录 -->
+	 <insert id="addItemDefect" >
+		insert 
+		into
+			I_ISSUE_BASE_INFO 
+				(
+			  ISSUE_ID,
+			   PROJECT_ID,
+			   PARENT_ISSUE_ID,
+			   ISSUE_NAME,
+			   ISSUE_DESC,
+			   ASSIGNEE,
+			   ISSUE_TYPE,
+			   ISSUE_SEVERITY,
+			   ISSUE_PRIORITY,
+			   PLAN_START_TIME,
+			   PLAN_END_TIME,
+			   PLAN_WORK_HOURS,
+			   DONE_CONDITION,
+			   ISSUE_STATE,
+			   CREATE_BY,
+			   CREATE_TIME,
+			   MODIFY_BY,
+			   MODIFY_TIME
+			)
+		values(
+			   nextval("SEQ_I_ISSUE_BASE_INFO"),
+			   #{projectId},
+			   #{parentIssueId},
+			   #{issueName},
+			   #{issueDesc},
+			   #{assignee},
+			   #{issueType},
+			   #{issueSeverity}, 
+			   #{issuePriority},
+			   #{planStartTime},
+			   #{planEndTime}, 
+			   #{planWorkHours}, 
+			   #{doneCondition},
+			   #{issueState},
+			   #{issueUseId},
+			   now(),
+			   #{issueUseId},  
+			   now()
+		)		
+	</insert>
+	<!-- 查询当前用户可见的所有缺陷信息 -->
+	<select id="queryAllData" resultType="com.huibo.issue.po.IssueBaseInfoPo">
+		SELECT
+			a.ISSUE_ID issueId,
+			g.PROJECT_NAME projectId,
+			a.ISSUE_NAME issueName,
+			d.PRIORITY_DESC issuePriority,
+			c.SEVERITY_DESC issueSeverity,
+			b.TYPE_DESC issueType,
+			e.STATE_DESC issueState,
+			f.USER_NAME assignee,
+			a.CREATE_TIME createTime,
+			a.PLAN_WORK_HOURS planWorkHours,
+			a.DONE_RATIO doneRatio,
+			a.PLAN_START_TIME planStartTime,
+			a.PLAN_END_TIME planEndTime,
+			a.ISSUE_DESC issueDesc,
+			a.DONE_CONDITION doneCondition
+		FROM
+			I_ISSUE_BASE_INFO AS a LEFT JOIN I_ISSUE_TYPE AS b ON a.ISSUE_TYPE = b.TYPE_CODE
+			LEFT JOIN I_ISSUE_SEVERITY AS c ON a.ISSUE_SEVERITY=c.SEVERITY_CODE
+			LEFT JOIN I_ISSUE_PRIORITY AS d ON a.ISSUE_PRIORITY=d.PRIORITY_CODE
+			LEFT JOIN I_ISSUE_STATE AS e ON a.ISSUE_STATE=e.STATE_CODE
+			LEFT JOIN sys_user AS f ON a.ASSIGNEE = f.USER_ID
+			LEFT JOIN INFO_ISSUE_PROJECT as g ON a.PROJECT_ID=g.PROJECT_ID
+		WHERE 
+			a.PROJECT_ID
+		IN
+			(
+				SELECT
+					c.PROJECT_ID
+				FROM
+					I_ISSUE_ROLE AS a LEFT JOIN I_ISSUE_PROJECT_ROLE_REL AS b ON a.ROLE_CODE = b.ROLE_CODE
+					LEFT JOIN INFO_ISSUE_PROJECT AS c ON c.PROJECT_ID=b.PROJECT_ID
+					LEFT JOIN I_ISSUE_BASE_INFO as d on d.PROJECT_ID=c.PROJECT_ID
+				WHERE
+					b.USER_ID=#{params.bo.userId}
+				AND
+					a.ROLE_CODE=004
+				OR
+					a.ROLE_CODE=001
+				OR
+					d.ASSIGNEE=#{params.bo.userId}
+				GROUP BY
+					c.PROJECT_ID
+			)
+		<if test="params.bo.startTime!=null and params.bo.startTime!=''">
+			and a.CREATE_TIME &gt;= '${params.bo.startTime}'
+		</if>
+		<if test="params.bo.endTime!=null and params.bo.endTime!=''">
+			and a.CREATE_TIME &lt;= '${params.bo.endTime}'
+		</if>
+		<if test="params.bo.projectId !=null and params.bo.projectId!='全部' and params.bo.projectId != '' ">
+			and a.PROJECT_ID=#{params.bo.projectId}
+		</if>
+		<if test="params.bo.issueState !=null and params.bo.issueState!='全部' and params.bo.issueState != ''">
+			and a.ISSUE_STATE=#{params.bo.issueState}
+		</if>
+		<if test="params.bo.sort!=null and params.bo.sort!=''">
+			order by ${params.bo.sort}
+			<if test="params.bo.order != null and params.bo.order !=''">
+				${params.bo.order}
+			</if>
+		</if>
+		<if test="params.bo.order == null or params.bo.order == ''">
+			order by a.CREATE_TIME desc
+		</if>
+	</select>
+	<!-- 查询一条缺陷信息 -->
+	<select id="forDetails" resultType="com.huibo.issue.po.IssueBaseInfoPo">
+		SELECT
+			a.ISSUE_ID issueId,
+			g.PROJECT_NAME projectId,
+			a.ISSUE_NAME issueName,
+			d.PRIORITY_DESC issuePriority,
+			c.SEVERITY_DESC issueSeverity,
+			b.TYPE_DESC issueType,
+			e.STATE_DESC issueState,
+			f.USER_NAME assignee,
+			a.CREATE_TIME createTime,
+			a.PLAN_WORK_HOURS planWorkHours,
+			a.DONE_RATIO doneRatio,
+			a.PLAN_START_TIME planStartTime,
+			a.PLAN_END_TIME planEndTime,
+			a.ISSUE_DESC issueDesc,
+			a.DONE_CONDITION doneCondition,
+			a.CREATE_BY createBy,
+			e.STATE_CODE issueStateNum,
+			a.ACT_START_TIME actStartTime,
+			a.ACT_END_TIME actEndTime,
+			a.ASSIGNED_TIME assigendTime,
+			f.USER_NAME assignee,
+			(
+				select sum(WORK_HOURS) from I_ISSUE_WORK_LOG where ISSUE_ID=#{issueUseId}
+			) actWorkeHours,
+			(
+				select 
+					ISSUE_NAME
+				from
+					I_ISSUE_BASE_INFO
+				where
+					ISSUE_ID=a.PARENT_ISSUE_ID
+			) parentIssueName
+		FROM
+			I_ISSUE_BASE_INFO AS a LEFT JOIN I_ISSUE_TYPE AS b ON a.ISSUE_TYPE = b.TYPE_CODE
+			LEFT JOIN I_ISSUE_SEVERITY AS c ON a.ISSUE_SEVERITY=c.SEVERITY_CODE
+			LEFT JOIN I_ISSUE_PRIORITY AS d ON a.ISSUE_PRIORITY=d.PRIORITY_CODE
+			LEFT JOIN I_ISSUE_STATE AS e ON a.ISSUE_STATE=e.STATE_CODE
+			LEFT JOIN sys_user AS f ON a.ASSIGNEE = f.USER_ID
+			LEFT JOIN INFO_ISSUE_PROJECT as g ON a.PROJECT_ID=g.PROJECT_ID
+		WHERE 
+			a.ISSUE_ID=#{issueUseId}
+	</select>
+	<!-- 查询一条附件信息 -->
+	<select id="queryAttach" resultType="com.huibo.issue.po.IIssueAttachPo">
+		select
+			ATTACH_ID attachId,
+			ISSUE_ID issueid,
+			ATTACH_FILE attachFile,
+			MIME_TYPE miniType,
+			IS_PIC isPic,
+			CREATE_BY logState,
+			ATTACH_FILE attachFile
+		from
+			I_ISSUE_ATTACH
+		where 
+			ISSUE_ID=#{issueId}
+	</select>
+	<!-- 查询一条附件信息根据附件表ID -->
+	<select id="queryAttachById" resultType="com.huibo.issue.po.IIssueAttachPo">
+		select
+			ATTACH_ID attachId,
+			ISSUE_ID issueid,
+			ATTACH_FILE attachFile,
+			MIME_TYPE miniType,
+			IS_PIC isPic,
+			CREATE_BY logState
+		from
+			I_ISSUE_ATTACH
+		where 
+			ATTACH_ID=#{issueId}
+	</select>
+	
+	<!-- 查询最大的缺陷编号 -->
+	<select id="queryMaxId" resultType="com.huibo.issue.po.IssueBaseInfoPo">
+	 	select max(ISSUE_ID) issueId from I_ISSUE_BASE_INFO 
+	</select>
+	
+	<!-- 增加缺附件表 -->
+	<insert id="addAttach">
+		insert
+		into
+			I_ISSUE_ATTACH
+			(
+			   ATTACH_ID,
+			   ISSUE_ID,
+			   ATTACH_FILE,
+			   FILE_SIZE,
+			   MIME_TYPE,
+			   IS_PIC,
+			   CREATE_BY,
+			   CREATE_TIME,
+			   MODIFY_BY,
+			   MODIFY_TIME
+			)
+		values
+			(
+			 nextval("SEQ_I_ISSUE_ATTACH"),
+			#{issueid},
+			#{attachFile},
+			#{fileSize},
+			#{miniType},
+			#{isPic},
+			#{userId},
+			now(),
+			#{userId},
+			now()
+			)
+	</insert>
+	<!-- 删除一条缺陷记录 -->
+	<delete id="removeIssueState">
+		delete
+		from
+			I_ISSUE_BASE_INFO 
+		where
+			ISSUE_ID=#{issueId}
+	</delete>
+	<!-- 删除缺陷记录对应的附件记录 -->
+	<delete id="removeAttach">
+		delete
+		from
+			I_ISSUE_ATTACH
+		where
+			ISSUE_ID=#{issueId}
+	</delete>
+	<!-- 修改缺陷记录 -->
+	<update id="modification">
+		update
+			I_ISSUE_BASE_INFO
+		set
+			ISSUE_NAME=#{issueName},
+			ISSUE_DESC=#{issueDesc},
+			ISSUE_TYPE=#{issueType},
+			ISSUE_SEVERITY=#{issueSeverity},
+			ISSUE_PRIORITY=#{issuePriority},
+			PLAN_START_TIME=#{planStartTime},
+			PLAN_END_TIME=#{planEndTime},
+			PLAN_WORK_HOURS=#{planWorkHours},
+			DONE_CONDITION=#{doneCondition},
+			MODIFY_BY=#{userId},
+			MODIFY_TIME=now()
+		where
+			ISSUE_ID=#{issueId}	
+	</update>
+</mapper>

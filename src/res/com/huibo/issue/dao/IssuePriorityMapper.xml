@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper	namespace="com.huibo.issue.dao.IssuePriorityDao">
+	<select id="queryIssuePriority" resultType="com.huibo.issue.bo.IssuePriorityBo">
+		select 
+				PRIORITY_CODE  priorityCode,
+				PRIORITY_DESC priorityDesc,
+				MODULE_STATE moduleState,
+				CREATE_BY createBy,
+				CREATE_TIME createTime,
+				MODIFY_BY modifyBy,
+				MODIFY_TIME modifyTime
+		from 
+				I_ISSUE_PRIORITY
+		<where>
+			<if test="params.bo.priorityCode != null ">
+				PRIORITY_CODE = params.bo.priorityCode
+			</if>
+			<if test="params.bo.priorityDesc != null ">
+				or PRIORITY_DESC = params.bo.priorityDesc
+			</if>
+		</where>
+	</select>
+	
+	<select id="checkedInfo" resultType="int">
+ 		select count(*) from I_ISSUE_PRIORITY where PRIORITY_CODE = #{param1}
+ 	</select>
+	
+	<update id="modifyIssuePriorityByCode">
+		update 
+			I_ISSUE_PRIORITY
+		set
+			PRIORITY_CODE = #{param2},
+			PRIORITY_DESC = #{param3},
+			MODIFY_BY = #{param4},
+			MODIFY_TIME = #{param5}
+		where
+			PRIORITY_CODE = #{param1}
+	</update>
+	
+	<delete id="deleteIssuePriorityByCodes">
+		delete from
+			I_ISSUE_PRIORITY
+		where
+			PRIORITY_CODE = " "
+			<if test="array.length>0">
+		or 
+					 PRIORITY_CODE
+		in
+			<foreach item="item" index="index" collection="array"
+ 					open="(" separator="," close=")">
+ 						#{item}
+ 			</foreach>
+			</if>
+	</delete>
+	
+	<update id="modifyIssueModuleStateByCode">
+		update 
+			I_ISSUE_PRIORITY
+		set
+			MODULE_STATE = #{param2}
+		where 
+			PRIORITY_CODE = #{param1}
+	</update>
+	
+	<insert id="addOnePriority">
+		insert into 
+			I_ISSUE_PRIORITY(PRIORITY_CODE,PRIORITY_DESC,MODULE_STATE,CREATE_BY,CREATE_TIME,MODIFY_BY,MODIFY_TIME)
+		values (#{param1},#{param2},1,#{param3},#{param4},#{param3},#{param4})
+	</insert>
+	
+</mapper>

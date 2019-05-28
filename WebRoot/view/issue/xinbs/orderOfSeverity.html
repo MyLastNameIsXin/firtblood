@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>缺陷严重程度</title>
+<meta name="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../css/common/main.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../css/themes/icon.css">
+<script type="text/javascript" src="../../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../js/common.js"></script>
+<script type="text/javascript" src="../../gmodule/js/common.js"></script>
+<script type="text/javascript" src="../../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../../js/highcharts/highcharts.js"></script>
+<script type="text/javascript" src="../../../js/highcharts/exporting.js"></script>
+<script type="text/javascript" src="js/orderOfSeverity.js"></script>
+</head>
+<body>
+<table class="btbHead">
+		<tr>
+			<td style='width: 25%;'> 
+				<img src='../../../images/common/title.gif' align='absmiddle' />缺陷严重程度</td>
+			<td style="text-align: right;">
+				<a href="javascript:designeeItem()" id="queryBtn" class="easyui-linkbutton" iconCls="icon-search">&nbsp;查&nbsp;&nbsp;询&nbsp;</a>
+			</td>
+		</tr>
+	</table>
+<!-- 条件查询表单 -->
+	<form id="form_search">
+		<table class="btbForm">
+			<tr>
+				<td>
+					&nbsp;&nbsp;&nbsp;创建时间&nbsp;&nbsp;<input id="startTime" name="startTime" type="text" class="easyui-datebox" data-options="showSeconds:false,prompt:'缺陷创建时间',editable:false">&nbsp;&nbsp;~&nbsp;
+					<input id="entTime" type="text" class="easyui-datebox" name="endTime" data-options="showSeconds:false,prompt:'缺陷创建时间',editable:false" >&nbsp;&nbsp;&nbsp;
+					项目名&nbsp;&nbsp;<input id="itema" class="easyui-combobox" name="projectId" data-options="panelHeight:'auto',editable:false">&nbsp;&nbsp;&nbsp;
+				</td>
+				<td align="right" >
+					<a href="javascript:reload()" id="reloadSelectedBtn" class="easyui-linkbutton" data-options="iconCls:'icon-reload'">清空搜索条件</a>
+				</td>
+			</tr>
+		</table>
+	</form>
+	<div style="margin: 5px;"></div>
+	<div id="container" style = "width: 800px; height:500px; margin: auto;"></div>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>项目管理</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/common/main.css"/>
+	<link rel="stylesheet" type="text/css" href="../../../css/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../../css/themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="css/infoIssueProtect.css">
+	<script type="text/javascript" src="../../../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../../../js/jquery.easyui.min.js"></script>
+</head>
+<body>
+    <!-- 头部信息 -->
+    <form name="searchForm" id="searchForm">
+    	<!-- 查询表头部 -->
+    	<table class='btbHead'>
+    		<tr>
+    			<td style="width:25%;">
+    			    <img src="../../../images/common/title.gif" align="absmiddle">项目管理
+    			</td>
+    			<td style="text-align:right;">
+  					<a href="#" id="queryBtn" class="easyui-linkbutton" onclick="addRootMenu()" iconCls="icon-add">增加根项目</a>
+  					<a href="#" id="queryBtn" class="easyui-linkbutton" onclick="addNextMenu()" iconCls="icon-add">增加次级项目</a>
+  					<a href="#" id="queryBtn" class="easyui-linkbutton" onclick="modifyMenu()" iconCls="icon-edit">&nbsp;修&nbsp;&nbsp;改&nbsp;</a>
+  				</td>
+    		</tr>
+    	</table>
+    	<!-- 查询条件 -->
+    	<table class="btbForm">
+    		<tr>
+    			<td style="text-align: right;">
+    				<!-- <input id="showNoUsedMenu" type="checkbox" style="vertical-align: middle;" onclick="changeUrl()">
+					<label for="showNoUsedMenu">显示无效的项目</label> -->
+    				<a href="javascript:doRefresh()" class="easyui-linkbutton" iconCls="icon-reload" plain="true"></a>
+    			</td>
+    		</tr>
+    	</table>
+    </form>
+    <!-- 间隔div -->
+    <div style="margin:5px 0;"></div>
+
+    <!-- 显示列表信息 -->
+    <table id="menuTreeGrid" class="easyui-treegrid" style="width:100%;" 
+	    data-options="
+	   	url:'findProtectInfo.json',
+	    loadFilter:loadProjectInfo,
+	    idField:'projectId',treeField:'projectName'">
+   	 <thead>
+        <tr>
+            <th data-options="field:'projectName',width:'15%',align:'left'">项目名称</th>
+            <th data-options="field:'projectId',width:'15%',align:'center'">项目编号</th>
+            <th data-options="field:'projectIntro',width:'40%',align:'left'">项目简介</th>
+            <th data-options="field:'projectState',width:'15%',align:'center',formatter:showState,">状态</th>
+            <th  data-options="field:'dom',width:'15%',align:'center',formatter:domContent," style="color:cornflowerblue;">操作</th>
+        </tr>   
+       </thead>
+    </table>
+
+    <!-- 增加根项目 -->
+	<div id="addRootMenu" class="easyui-dialog" 
+        data-options=" buttons:'#sureAddBtn',closed:true,width:'300',title:'新增根项目'">
+        <form method="post" id="addRootMenuForm">
+            <table class="menuTable">
+                <tr>
+                    <td>项目编号</td>
+                    <td>
+                        <input type="text" name="projectId" id="addprojectId"
+                        onchange="isID(this)" style="padding:4px;">
+                        <br><span id="showAddInfo"></span>
+                    </td>
+                </tr>
+                <tr >
+                    <td>项目名称</td>
+                    <td><input type="text" name="projectName"  id="addprojectName"  onchange="isName(this)">
+                        <br><span id="showNameInfo"></span>
+                    </td>
+                </tr>
+                <tr >
+                    <td>项目简介</td>
+                    <td><input type="text" name="projectIntro"></td>
+                </tr>
+                <tr >
+                    <td><span style="position:relative;top:-12px;">项目描述</span></td>
+                    <td>
+                        <textarea type="text" name="projectDesc" style="width:182px;height:40px;font-family:Arial;"></textarea>
+                    </td>
+                </tr>
+                <tr >
+                    <td>状态</td>
+                    <td>
+                        <select name="projectState" style="width:100px;">
+                            <option value="0">无效</option>   
+                            <option value="1">有效</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <!-- 增根目录框确认,取消按钮 -->
+	<div id="sureAddBtn">
+		<a href="#" class="easyui-linkbutton" onclick="return sureAddBtn(),false">确认</a>
+		<a href="#" class="easyui-linkbutton" onclick="return closeAddMeun(),false">取消</a>
+	</div>
+
+    <!-- 增加下级弹窗 -->
+	<div id="addNextMenu" class="easyui-dialog"
+		 data-options="buttons:'#sureBtnNext',closed:true,width:'320',title:'增加下级菜单'">
+		 <form method="post" id="addNextMenuForm">
+    		<table id="protectInfo" class="menuTable">
+    			<tr>
+    				<td>项目编号</td>
+    				<td>
+    					<span id="superId"></span><input type="text" name="projectId" id="projectNext_ID" onchange="isNextID(this)">
+    					<br><span id="showNextInfo"></span>
+    				</td>
+    			</tr>
+    			<tr >
+    				<td>项目名称</td>
+    				<td>
+    					<input id="projectNextNAME" type="text" name="projectName" onchange="isName(this)">
+    					<br><span id="showNameNextInfo"></span>
+    				</td>
+    			</tr>
+    			<tr >
+    				<td>项目简介</td>
+    				<td><input type="text" name="projectIntro" ></td>
+    			</tr>
+    			<tr >
+    				<td><span style="position:relative;top:-12px;">项目描述</span></td>
+    				<td>
+    					<textarea type="text" name="projectDesc" style="width:182px;height:40px;font-family:Arial;"></textarea>
+    				</td>
+    			</tr>
+    			<tr >
+    				<td>状态</td>
+    				<td>
+						<select name="projectState" style="width:100px;">
+							<option value="0">无效</option>   
+						    <option value="1">有效</option>
+						</select>
+    				</td>
+    			</tr>
+    		</table>
+		</form>
+    </div>
+    <!-- 增加次级项目链接按钮 -->
+    <div id="sureBtnNext">
+		<a href="#" class="easyui-linkbutton" onclick="return sureNextBtn(),false">确认</a>
+		<a href="#" class="easyui-linkbutton" onclick="return closeNextMuen(),false">取消</a>
+    </div>
+    
+    <!-- 修改弹窗 -->
+	<div id="modifyMenu" class="easyui-dialog" 
+		data-options=" buttons:'#modifyBtn',closed:true,width:'300',title:'修改项目信息'">
+		<form method="post" id="modifyMenuForm">
+    		<table class="menuTable">
+    			<tr>
+    				<td>项目编号</td>
+    				<td>
+    					<input type="text" name="projectId" style="padding:4px;" readonly="readonly">
+    				</td>
+    			</tr>
+    			<tr >
+    				<td>项目名称</td>
+    				<td><input type="text" name="projectName"  id="projectModifyName">
+    					<br><span id="showNameInfo"></span>
+    				</td>
+    			</tr>
+    			<tr >
+    				<td>项目简介</td>
+    				<td><input type="text" name="projectIntro"></td>
+    			</tr>
+    			<tr >
+    				<td><span style="position:relative;top:-12px;">项目描述</span></td>
+    				<td>
+    					<textarea type="text" name="projectDesc" style="width:182px;height:40px;font-family:Arial;"></textarea>
+    				</td>
+    			</tr>
+    			<tr >
+    				<td>状态</td>
+    				<td>
+						<select name="projectState" style="width:100px;">
+							<option value="0">无效</option>   
+						    <option value="1">有效</option>
+						</select>
+    				</td>
+    			</tr>
+    		</table>
+		</form>
+    </div>
+    <!-- 修改项目信息链接按钮 -->
+	<div id="modifyBtn">
+		<a href="#" class="easyui-linkbutton" onclick="return sureModifyBtn(),false">确认</a>
+		<a href="#" class="easyui-linkbutton" onclick="return closeModifyMeun(),false">取消</a>
+    </div>
+    
+    <!-- 详情框 -->
+	<div id="detailedMuen" class="easyui-dialog" title="项目详情" style="width:330px;"   
+        data-options="resizable:true,modal:true,closed:true">
+    	<form method="post" id="detailedForm">
+    		<table id="detailedInfo" style="width:90%;margin-left:30px;">
+    			<tr>
+    				<td>项目编号:</td>
+    				<td><input type="text" name="projectId" readonly style="border:0;"></td>
+    			</tr>
+    			<tr>
+    				<td>项目名称:</td>
+    				<td><input type="text" name="projectName" readonly style="border:0;"></td>
+    			</tr>
+    			<tr >
+    				<td>项目简介:</td>
+    				<td><input type="text" name="projectIntro" readonly style="border:0;"></td>
+    			</tr>
+    			<tr >
+    				<td style="position: relative;top:-26px;">项目描述:</td>
+    				<td><textarea style="width:172px;height:60px;border:0;" name="projectDesc" readonly style="border:0;"></textarea>
+    			</tr>
+    			<tr >
+    				<td>状态:</td>
+    				<td><input type="text" name="projectState" readonly style="border:0;"></td>
+    			</tr>
+    			<tr >
+    				<td>上级目录:</td>
+    				<td><input type="text" name="pProjectId" readonly style="border:0;"></td>
+    			</tr>
+    			<tr >
+    				<td>创建人:</td>
+    				<td><input type="text" name="createBy" readonly style="border:0;"></td>
+    			</tr>
+    			<tr >
+    				<td>创建时间:</td>
+    				<td><input type="text" name="createTime" readonly style="border:0;"></td>
+    			</tr>
+    			<tr >
+    				<td>修改人:</td>
+    				<td><input type="text" name="modifyBy" readonly style="border:0;"></td>
+    			</tr>
+    			<tr >
+    				<td>修改时间:</td>
+    				<td><input type="text" name="modifyTime" readonly style="border:0;"></td>
+    			</tr>
+    		</table>
+		</form>
+	</div> 
+</body>
+	<script type="text/javascript" src="js/infoIssueProject.js"></script>
+</html>

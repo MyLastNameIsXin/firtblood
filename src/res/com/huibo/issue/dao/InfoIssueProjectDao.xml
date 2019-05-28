@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huibo.issue.dao.InfoIssueProjectDao">
+	
+	<!-- 查询有效项目信息 -->
+	<select id="findProtectStartInfo" resultType="com.huibo.issue.bo.InfoIssueProjectBO" >
+	
+		select 
+			project_ID projectId,
+			project_NAME projectName,
+			project_INTRO projectIntro,
+			project_DESC projectDesc,
+			project_STATE projectState,
+			p_project_ID pProjectId,
+			create_BY createBy,
+			create_TIME createTime,
+			modify_BY modifyBy,
+			modify_TIME modifyTime
+		from 
+			INFO_ISSUE_PROJECT
+		where 
+			P_PROJECT_ID = #{id} and PROJECT_STATE = "1"
+	</select>
+	
+	
+	<!-- 查询项目信息 -->
+	<select id="findProtectInfo" resultType="com.huibo.issue.bo.InfoIssueProjectBO" >
+		select 
+			project_ID projectId,
+			project_NAME projectName,
+			project_INTRO projectIntro,
+			project_DESC projectDesc,
+			project_STATE projectState,
+			p_project_ID pProjectId,
+			create_BY createBy,
+			create_TIME createTime,
+			modify_BY modifyBy,
+			modify_TIME modifyTime
+		from 
+			INFO_ISSUE_PROJECT
+		where 
+			P_PROJECT_ID = #{id}
+	</select>
+	
+	<!-- 查询子项目条数 -->
+	<select id="findChildInfo" resultType="java.lang.Integer">
+		select 
+			count(*) 
+		from
+			INFO_ISSUE_PROJECT
+		where 
+			P_PROJECT_ID = #{pid}
+	</select>
+	
+	<!-- 查询父级 -->
+	<select id="findFatherProtectInfo" resultType="com.huibo.issue.bo.InfoIssueProjectBO">
+		select 
+			project_ID projectId,
+			project_NAME projectName,
+			project_INTRO projectIntro,
+			project_DESC projectDesc,
+			project_STATE projectState,
+			p_project_ID pProjectId,
+			create_BY createBy,
+			create_TIME createTime,
+			modify_BY modifyBy,
+			modify_TIME modifyTime
+		from 
+			INFO_ISSUE_PROJECT
+		where PROJECT_ID = #{pid}
+	</select>
+	
+	
+	<!-- 模糊查询 -->
+	<select id="findLikeProtectInfo" resultType="com.huibo.issue.bo.InfoIssueProjectBO">
+		select 
+			project_ID projectId,
+			project_NAME projectName,
+			project_INTRO projectIntro,
+			project_DESC projectDesc,
+			project_STATE projectState,
+			p_project_ID pProjectId,
+			create_BY createBy,
+			create_TIME createTime,
+			modify_BY modifyBy,
+			modify_TIME modifyTime 
+		from 
+			INFO_ISSUE_PROJECT
+		where P_PROJECT_ID like '%${pid}%'
+	</select>
+	
+	
+	<!-- 查询项目条数 -->
+	<select id="findProtectId" resultType="java.lang.Integer">
+		select 
+			count(*) 
+		from
+			INFO_ISSUE_PROJECT
+		where 
+			PROJECT_ID = #{pid}
+	</select>
+	
+	<!-- 新增项目 -->
+	<insert id="addProtectInfo">
+		insert into INFO_ISSUE_PROJECT(
+			PROJECT_ID,
+			PROJECT_NAME,
+			PROJECT_INTRO,
+			P_PROJECT_ID,
+			PROJECT_STATE,
+			CREATE_BY,
+			CREATE_TIME,
+			project_DESC
+			) 
+		values(
+			#{projectId},
+			#{projectName},
+			#{projectIntro},
+			#{pProjectId},
+			#{projectState},
+			#{createBy},
+			#{createTime},
+			#{projectDesc}
+			)
+	</insert>
+	
+	<!-- 修改项目  -->
+	<update id="modifyProtectInfo">
+		update 
+			INFO_ISSUE_PROJECT 
+		set 
+			PROJECT_NAME = #{projectName},
+			PROJECT_INTRO = #{projectIntro},
+			PROJECT_STATE = #{projectState},
+			MODIFY_BY = #{createBy},
+			MODIFY_TIME = #{createTime},
+			project_DESC = #{projectDesc}
+		where 
+			PROJECT_ID = #{projectId}
+	</update>
+</mapper>

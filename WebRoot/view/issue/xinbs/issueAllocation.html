@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../css/common/main.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../css/themes/icon.css">
+<link rel="stylesheet" href="css/defectLists.css" />
+<script type="text/javascript" src="../../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../js/common.js"></script>
+<script type="text/javascript" src="../../gmodule/js/common.js"></script>
+<script type="text/javascript" src="../../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="js/issueAllocation.js"></script>
+<title>缺陷分配</title>
+</head>
+<body>
+<table class="btbHead">
+		<tr>
+			<td style='width: 25%;'> 
+				<img src='../../../images/common/title.gif' align='absmiddle' />缺陷分配</td>
+			<td style="text-align: right;">
+				<a href="javascript:allotIsAdministrator()" id="queryBtn" class="easyui-linkbutton" iconCls="icon-search">&nbsp;查&nbsp;&nbsp;询&nbsp;</a>
+			</td>
+		</tr>
+	</table>
+<!-- 条件查询表单 -->
+	<form id="form_search">
+		<table class="btbForm">
+			<tr>
+				<td>
+					&nbsp;&nbsp;&nbsp;创建时间&nbsp;&nbsp;<input id="startTime" name="startTime" type="text" class="easyui-datebox" data-options="showSeconds:false,prompt:'缺陷创建时间',editable:false">&nbsp;&nbsp;~&nbsp;
+					<input id="entTime" type="text" class="easyui-datebox" name="endTime" data-options="showSeconds:false,prompt:'缺陷创建时间',editable:false" >&nbsp;&nbsp;&nbsp;
+					项目名&nbsp;&nbsp;<input id="itema" class="easyui-combobox" name="projectId" data-options="panelHeight:'auto',editable:false">&nbsp;&nbsp;&nbsp;
+				</td>
+				<td align="right" >
+					<a href="javascript:reload()" id="reloadSelectedBtn" class="easyui-linkbutton" data-options="iconCls:'icon-reload'">清空搜索条件</a>
+				</td>
+			</tr>
+		</table>
+	</form>
+	<div style="margin: 5px;"></div>
+	<!-- 功能列表 -->
+	<table id="dg" class="easyui-datagrid"
+		style="width: 100%; padding: 10px;"
+		data-options="pagination:true,selectOnCheck:false,singleSelect:true,singleSelect:true">
+		<thead>
+			<tr>
+				<th data-options="field:'projectName',halign:'center'" width="11%">项目名称</th>
+				<th data-options="field:'issueName',halign:'center'" width="14%">任务名称</th>
+				<th data-options="field:'issuePriority',align:'center',sortable:true" width="11%">优先级</th>
+				<th data-options="field:'issueSeverity',align:'center',halign:'center'" width="11%">严重程度</th>
+				<th data-options="field:'issueType',halign:'center',align:'center'" width="10%">缺陷分类</th>
+				<th data-options="field:'issueState',align:'center',halign:'center'" width="10%">状态</th>
+				<th data-options="field:'assignee',align:'center'" width="10%">指派</th>
+				<th data-options="field:'createTime',align:'center',sortable:'true'" width="13%" formatter="genderFormatter">创建时间</th>
+				<th data-options="field:'dwda',align:'center',formatter:formatOper" width="10%">操作</th>
+			</tr>
+		</thead>
+	</table>
+	<!-- 显示详情面板 -->
+	<div class="easyui-dialog" id="dlg_particulars" style="width: 450px; height: 430px"
+		data-options="buttons:'#btn_close',modal:true,closed:true">
+			<table style="margin: 13px;font-size: 14px;border-spacing: 3px 8px;">
+				<tr>
+					<td><input type="hidden" id="issueId" name="issueId"  value=""/><td>
+				</tr>
+				<tr>
+					<td width="105px" class="right">项目名称 :</td>
+					<td><span id="projectId"></span></td>
+					<td  width="105px" class="right">父级缺陷 :</td>
+					<td><span id="parentIssueId"></span></td>
+				</tr>
+				<tr>
+					<td class="right">缺陷名称 :</td>
+					<td><span id="issueName"></span></td>
+					<td class="right">完成率 :</td>
+					<td><span id="doneRatio"></span></td>
+				</tr>
+				<tr>
+					<td class="right">缺陷分类 :</td>
+					<td><span id="issueType"></span></td>
+					<td class="right">缺陷状态 :</td>
+					<td><span id="issueState"></span></td>
+				</tr>
+				<tr>
+					<td class="right">严重程度 :</td>
+					<td><span id="issueSeverity"></span></td>
+					<td class="right">优先级 :</td>
+					<td><span id="issuePriority"></span></td>
+				</tr>
+				<tr>
+					<td class="right">被指派人 :</td>
+					<td><span id="assignee"></span></td>
+					<td class="right" valign="top">指派时间 :</td>
+					<td><span id="assigendTime"></span></td>
+				</tr>
+				<tr>
+					<td class="right">预计工时 :</td>
+					<td><span id="planWorkHours"></span></td>
+					<td class="right">实际工时 :</td>
+					<td><span id="actWorkeHours"></span></td>
+				</tr>
+				<tr>
+					<td class="right">预计开始时间 :</td>
+					<td><span id="planStartTime"></span></td>
+					<td class="right">预计完成时间 :</td>
+					<td><span id="planEndTime"></span></td>
+				</tr>
+				<tr>
+					<td class="right">实际开始时间 :</td>
+					<td><span id="actStartTime"></span></td>
+					<td class="right">实际完成时间 :</td>
+					<td><span id="actEndTime"></span></td>
+				</tr>
+				<tr>
+					<td class="right">缺陷描述 :</td>
+					<td  colspan="3"><div id="issueDesc"></div></td>
+				</tr>
+				<tr>
+					<td class="right">缺陷要求 :</td>
+					<td colspan="3"><div id="doneCondition"></div></td>
+				</tr>
+				<tr>
+					<td  class="right">
+						指派给 :
+					</td>
+					<td colspan="3">
+						<input id="appoint" class="easyui-combobox" name="assignee" data-options="panelHeight:'auto',editable:false">
+					<td>
+				</tr>
+			</table>
+	</div>
+	<!-- 缺陷分配页面确定按钮-->
+	<div id="btn_close">
+		<a href="javascript:confirmPanel()" class="easyui-linkbutton" iconCls="icon-save" style="padding-button: 5px">确认</a>
+	</div>
+</body>
+</html>

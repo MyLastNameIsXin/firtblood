@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>用户管理</title>
+<meta charset="UTF-8">
+<meta name="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="../../../css/common/main.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../css/themes/icon.css">
+<script type="text/javascript" src="../../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../js/common.js"></script>
+<script type="text/javascript" src="../../gmodule/js/common.js"></script>
+<script type="text/javascript" src="js/project-roles.js"></script>
+
+</head>
+
+<body>
+	<table class="btbHead">
+		<tr>
+			<td style='width: 25%;'> 
+				<img src='../../../images/common/title.gif' align='absmiddle' />项目角色</td>
+			<td style="text-align: right;">
+				<a href="javascript:doAdd()" id="addBtn" class="easyui-linkbutton" iconCls="icon-add">&nbsp;新&nbsp;&nbsp;增&nbsp;</a>
+				<a href="javascript:modif()" id="modifyBtn" class="easyui-linkbutton" iconCls="icon-edit">&nbsp;修&nbsp;&nbsp;改&nbsp;</a>
+				<a href="javascript:remove()" id="clearSelectedBtn" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">&nbsp;删&nbsp;&nbsp;除&nbsp;</a>
+			</td>
+		</tr>
+	</table>
+	<table class="btbForm">
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	<div style="margin: 5px;"></div>
+
+	<!-- 功能列表 -->
+	<table id="dg" class="easyui-datagrid"
+		style="width: 100%; padding: 10px;"
+		data-options="pagination:true,selectOnCheck:false,singleSelect:true,url:'../../../queryAllRole.json',singleSelect:true">
+		<thead>
+			<tr>
+				<th
+					data-options="field:'roleCode',halign:'center',sortable:true,align:'center'"
+					width="10%">编号</th>
+				<th
+					data-options="field:'roleName',halign:'center'"
+					width="22%">项目角色名</th>
+				<th
+					data-options="field:'canDo'"
+					width="22%">可操作状态</th>
+				<th
+					data-options="field:'moduleState',align:'center',sortable:true"
+					width="22%" formatter="genderFormatter">状态</th>
+				<th
+					data-options="field:'mobile',align:'center',formatter:formatOper"
+					width="22%">操作</th>
+			</tr>
+		</thead>
+	</table>
+
+	<!-- 添加、修改界面弹窗 -->
+	<div class="easyui-dialog" id="dlg_save" style="width: 250px; height: 300px;padding: 10px;"
+		data-options="buttons:'#btn_dlg',modal:true,onBeforeOpen:operability,closed:true">
+		<form action="#" method="get" id="dlg_form">
+			<table>
+				<tr>
+					<td style="text-align: right;">编号</td>
+					<td><input id="roleNum" name="roleCode" class="easyui-textbox" style="width: 150px" ></td>
+				</tr>
+				<tr>
+					<td  style="text-align: right;">项目角色</td>
+					<td><input id="roleName" name="roleName" class="easyui-textbox" style="width: 150px" ></td>
+				</tr>
+				 <tr >
+				 	<td colspan="2">
+					<fieldset style="padding: 20px;">
+    				<legend>缺陷状态</legend> 
+					  <div id="aaa">
+					  
+					  </div>
+  					</fieldset>
+  					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<!--新增修改页面保存按钮-->
+	<div id="btn_dlg">
+		<a href="javascript:doSave()" class="easyui-linkbutton" iconCls="icon-save" style="padding-button: 5px">添加</a>
+	</div>
+	
+	
+</body>
+</html>

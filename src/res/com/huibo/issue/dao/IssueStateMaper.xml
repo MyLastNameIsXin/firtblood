@@ -1,0 +1,89 @@
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.huibo.issue.dao.IssueStateDao">
+ 	<select id="queryIssueState" resultType="com.huibo.issue.bo.IssueStateBo">
+ 		select 
+ 			STATE_CODE stateCode,
+ 			STATE_DESC stateDesc,
+ 			MODULE_STATE moduleState,
+ 			CREATE_BY createBy,
+ 			CREATE_TIME createTime,
+ 			MODIFY_BY modifyBy,
+ 			MODIFY_TIME modifyTime
+ 		from I_ISSUE_STATE
+ 		<where>
+ 			<if test="params.bo.stateCode != null">
+ 				STATE_CODE like #{params.bo.stateCode}
+ 			</if>
+ 			<if test="params.bo.stateDesc !=null ">
+ 				and STATE_DESC like #{params.bo.stateDesc}
+ 			</if>
+ 			<if test="params.bo.moduleState != null">
+ 				and MODULE_STATE like #{params.bo.moduleState}
+ 			</if>
+ 			<if test="params.bo.createBy != null">
+ 				and CREATE_BY like #{params.bo.createBy}
+ 			</if>
+ 			<if test="params.bo.createTime">
+ 				and CREATE_TIME like #{params.bo.createTime}
+ 			</if>
+ 			<if test="params.bo.modifyBy != null">
+ 				and CREATE_BY like #{params.bo.modifyBy}
+ 			</if>
+ 			<if test="params.bo.modifyTime">
+ 				and CREATE_TIME like #{params.bo.modifyTime}
+ 			</if>
+ 		</where>
+ 	</select>
+ 	
+ 	<select id="checkedInfo" resultType="int">
+ 		select count(*) from I_ISSUE_STATE where STATE_CODE = #{param1}
+ 	</select>
+ 
+	<insert id="addOneState">
+		insert into 
+			I_ISSUE_STATE(STATE_CODE,STATE_DESC,MODULE_STATE,CREATE_BY,CREATE_TIME,MODIFY_BY,MODIFY_TIME)
+		values (#{stateCode},#{stateDesc},#{moduleState},#{createBy},#{createTime},#{modifyBy},#{modifyTime})
+	</insert>
+ 	
+   		<delete id="deleteStateByCode">
+		delete from
+			I_ISSUE_STATE
+		where
+			STATE_CODE = " "
+			<if test="array.length>0">
+		or 
+					 STATE_CODE
+		in
+			<foreach item="item" index="index" collection="array"
+ 					open="(" separator="," close=")">
+ 						#{item}
+ 			</foreach>
+			</if>
+	</delete>
+	
+	<update id="modifyStateByCode">
+		update
+				I_ISSUE_STATE
+		set
+			STATE_CODE = #{param1.stateCode},
+			STATE_DESC = #{param1.stateDesc},
+			MODIFY_BY = #{param1.modifyBy},
+			MODIFY_TIME = #{param1.modifyTime}
+		where
+			STATE_CODE = #{param2}
+	</update>
+	
+	<update id="modifyStateModulestateByCode">
+		update
+				I_ISSUE_STATE
+		set
+			MODULE_STATE = #{moduleState},
+			MODIFY_BY = #{modifyBy},
+			MODIFY_TIME = #{modifyTime}
+		where
+			STATE_CODE = #{stateCode}
+	</update>  
+ </mapper>

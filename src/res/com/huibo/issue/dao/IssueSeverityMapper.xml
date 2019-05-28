@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <mapper namespace="com.huibo.issue.dao.IssueSeverityDao">
+ 	<select id="queryIssueServerity" resultType="com.huibo.issue.bo.IssueSeverityBo">
+ 		select 
+ 			SEVERITY_CODE severityCode,
+ 			SEVERITY_DESC severityDesc,
+ 			MODULE_STATE moduleState,
+ 			CREATE_BY createBy,
+ 			CREATE_TIME createTime,
+ 			MODIFY_BY modifyBy,
+ 			MODIFY_TIME modifyTime
+ 		from I_ISSUE_SEVERITY
+ 		<where>
+ 			<if test="params.bo.severityCode != null">
+ 				SEVERITY_CODE like #{params.bo.severityCode}
+ 			</if>
+ 			<if test="params.bo.severityDesc !=null ">
+ 				and SEVERITY_DESC like #{params.bo.severityDesc}
+ 			</if>
+ 			<if test="params.bo.moduleState != null">
+ 				and MODULE_STATE like #{params.bo.moduleState}
+ 			</if>
+ 			<if test="params.bo.createBy != null">
+ 				and CREATE_BY like #{params.bo.createBy}
+ 			</if>
+ 			<if test="params.bo.createTime">
+ 				and CREATE_TIME like #{params.bo.createTime}
+ 			</if>
+ 			<if test="params.bo.modifyBy != null">
+ 				and CREATE_BY like #{params.bo.modifyBy}
+ 			</if>
+ 			<if test="params.bo.modifyTime">
+ 				and CREATE_TIME like #{params.bo.modifyTime}
+ 			</if>
+ 		</where>
+ 	</select>
+ 
+ 	<select id="checkedInfo" resultType="int">
+ 		select count(*) from I_ISSUE_SEVERITY where SEVERITY_CODE = #{param1}
+ 	</select>
+ 	
+ 	<insert id="addOneServerity">
+		insert into 
+			I_ISSUE_SEVERITY(SEVERITY_CODE,SEVERITY_DESC,MODULE_STATE,CREATE_BY,CREATE_TIME,MODIFY_BY,MODIFY_TIME)
+		values (#{severityCode},#{severityDesc},#{moduleState},#{createBy},#{createTime},#{modifyBy},#{modifyTime})
+	</insert>
+ 	
+ 	<delete id="deleteServerityByCode">
+		delete from
+			I_ISSUE_SEVERITY
+		where
+			SEVERITY_CODE = " "
+			<if test="array.length>0">
+		or 
+					 SEVERITY_CODE
+		in
+			<foreach item="item" index="index" collection="array"
+ 					open="(" separator="," close=")">
+ 						#{item}
+ 			</foreach>
+			</if>
+	</delete>
+	
+	<update id="modifyServerityByCode">
+		update
+				I_ISSUE_SEVERITY
+		set
+			SEVERITY_CODE = #{param1.severityCode},
+			SEVERITY_DESC = #{param1.severityDesc},
+			MODIFY_BY = #{param1.modifyBy},
+			MODIFY_TIME = #{param1.modifyTime}
+		where
+			SEVERITY_CODE = #{param2}
+	</update>
+	
+	<update id="modifyServerityModulestateByCode">
+		update
+				I_ISSUE_SEVERITY
+		set
+			MODULE_STATE = #{moduleState},
+			MODIFY_BY = #{modifyBy},
+			MODIFY_TIME = #{modifyTime}
+		where
+			SEVERITY_CODE = #{severityCode}
+	</update>
+ </mapper>

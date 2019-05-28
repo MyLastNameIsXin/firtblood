@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huibo.issue.dao.DefectTreatmentDao">
+	<!-- 查询当前用户需要处理的缺陷 -->
+	<select id="designeeItem" resultType="com.huibo.issue.po.IssueBaseInfoPo">
+		SELECT
+			a.ISSUE_ID issueId,
+			g.PROJECT_NAME projectName,
+			f.USER_NAME assignee,
+			a.PROJECT_ID projectId,
+			a.ISSUE_NAME issueName,
+			d.PRIORITY_DESC issuePriority,
+			c.SEVERITY_DESC issueSeverity,
+			b.TYPE_DESC issueType,
+			e.STATE_DESC issueState,
+			a.PLAN_WORK_HOURS planWorkHours,
+			a.CREATE_TIME createTime,
+			a.PLAN_START_TIME planStartTime,
+			a.PLAN_END_TIME planEndTime,
+			a.ISSUE_DESC issueDesc,
+			a.DONE_CONDITION doneCondition
+		FROM
+			I_ISSUE_BASE_INFO AS a LEFT JOIN I_ISSUE_TYPE AS b ON a.ISSUE_TYPE = b.TYPE_CODE
+			LEFT JOIN I_ISSUE_SEVERITY AS c ON a.ISSUE_SEVERITY=c.SEVERITY_CODE
+			LEFT JOIN I_ISSUE_PRIORITY AS d ON a.ISSUE_PRIORITY=d.PRIORITY_CODE
+			LEFT JOIN I_ISSUE_STATE AS e ON a.ISSUE_STATE=e.STATE_CODE
+			LEFT JOIN sys_user AS f ON a.ASSIGNEE = f.USER_ID
+			LEFT JOIN INFO_ISSUE_PROJECT as g ON a.PROJECT_ID=g.PROJECT_ID
+		WHERE 
+			a.ASSIGNEE=#{params.bo.userId}
+		AND
+			a.ISSUE_STATE='02'
+ 		<if test="params.bo.startTime!=null and params.bo.startTime!=''">
+ 			and a.CREATE_TIME &gt; '${params.bo.startTime}'
+ 		</if>
+		<if test="params.bo.endTime!=null and params.bo.endTime!=''">
+ 			and a.CREATE_TIME &lt; '${params.bo.endTime}'
+		</if>
+ 		<if test="params.bo.projectId !=null and params.bo.projectId!='全部' and params.bo.projectId != '' ">
+ 			and a.PROJECT_ID=#{params.bo.projectId}
+ 		</if>
+ 		<if test="params.bo.issueState !=null and params.bo.issueState!='全部' and params.bo.issueState != ''">
+ 			and a.ISSUE_STATE=#{params.bo.issueState}
+		</if>
+ 		<if test="params.bo.sort!=null and params.bo.sort!=''">
+ 			order by ${params.bo.sort}
+			<if test="params.bo.order != null and params.bo.order !=''">
+				${params.bo.order}
+			</if>
+		</if>
+		<if test="params.bo.order == null or params.bo.order == ''">
+			order by a.CREATE_TIME desc
+		</if>
+	</select>
+	
+	<!-- 查询当前用户以开发人员身份参与的项目 -->
+	<select id="queryItemDisposePull" resultType="com.huibo.issue.po.InfoIssueProjectPO">
+		SELECT 
+			a.PROJECT_ID projectId,
+			a.PROJECT_NAME projectName
+		FROM
+			INFO_ISSUE_PROJECT AS a LEFT JOIN I_ISSUE_PROJECT_ROLE_REL AS b ON a.PROJECT_ID=b.PROJECT_ID
+			LEFT JOIN I_ISSUE_ROLE AS c ON b.ROLE_CODE=c.ROLE_CODE
+		WHERE 
+			b.USER_ID=#{userId}
+		AND 
+			c.ROLE_CODE='002'
+	</select>
+	
+	<!-- 查询一条缺陷记录，根绝缺陷编号 -->
+	<select id="dispose" resultType="com.huibo.issue.po.IssueBaseInfoPo">
+		select
+			a.ISSUE_ID issueId,
+			g.PROJECT_NAME projectName,
+			a.PROJECT_ID projectId,
+			a.ISSUE_NAME issueName,
+			d.PRIORITY_DESC issuePriority,
+			c.SEVERITY_DESC issueSeverity,
+			b.TYPE_DESC issueType,
+			e.STATE_DESC issueState,
+			a.PLAN_WORK_HOURS planWorkHours,
+			a.PLAN_START_TIME planStartTime,
+			a.PLAN_END_TIME planEndTime,
+			a.ISSUE_DESC issueDesc,
+			a.DONE_RATIO doneRatio,
+			a.DONE_CONDITION doneCondition,
+			a.ACT_START_TIME actStartTime,
+			a.ACT_END_TIME actEndTime,
+			a.ASSIGNED_TIME assigendTime,
+			f.USER_NAME assignee,
+			(
+				select sum(WORK_HOURS) from I_ISSUE_WORK_LOG where ISSUE_ID=#{issueUseId}
+			) actWorkeHours,
+			(
+				select 
+					ISSUE_NAME
+				from
+					I_ISSUE_BASE_INFO
+				where
+					ISSUE_ID=a.PARENT_ISSUE_ID
+			) parentIssueName
+		from 
+			I_ISSUE_BASE_INFO AS a LEFT JOIN I_ISSUE_TYPE AS b ON a.ISSUE_TYPE = b.TYPE_CODE
+			LEFT JOIN I_ISSUE_SEVERITY AS c ON a.ISSUE_SEVERITY=c.SEVERITY_CODE
+			LEFT JOIN I_ISSUE_PRIORITY AS d ON a.ISSUE_PRIORITY=d.PRIORITY_CODE
+			LEFT JOIN I_ISSUE_STATE AS e ON a.ISSUE_STATE=e.STATE_CODE
+			LEFT JOIN sys_user AS f ON a.ASSIGNEE = f.USER_ID
+			LEFT JOIN INFO_ISSUE_PROJECT as g ON a.PROJECT_ID=g.PROJECT_ID
+		WHERE 
+			a.ISSUE_ID=#{issueUseId}
+	</select>
+	<!-- 查询当前缺陷的反馈条数 -->
+	<select id="retroactionNum" resultType="com.huibo.issue.po.IssueCommentPo">
+		select 
+			count(*) retroactionNum
+		from
+			I_ISSUE_COMMENT
+		where
+			ISSUE_ID=#{issueUseId}
+	</select>
+	<!-- 查询当前缺陷下的所有反馈信息 -->
+	<select id="seeFeedback" resultType="com.huibo.issue.po.IssueCommentPo">
+		select
+			LOG_ID logId,
+			COMMENT comment,
+			CREATE_TIME createTime
+		from
+			I_ISSUE_COMMENT
+		where
+			ISSUE_ID=#{params.bo.issueId}
+	</select>
+	<!-- 查询指定状态用于生成下拉 -->
+	<select id="imperStatePull" resultType="com.huibo.issue.po.IssueStatePo"> 
+		select
+			STATE_CODE sateCode,
+			STATE_DESC stateDesc
+		from 
+			I_ISSUE_STATE
+		where
+			STATE_CODE='02'
+		or
+			STATE_CODE='03'
+	</select>
+	<!-- 更改缺陷记录的缺陷状态以及完成率 -->
+	<update id="modifIssueState">
+		update
+			I_ISSUE_BASE_INFO
+		set
+			ISSUE_STATE=#{projectId},
+			DONE_RATIO=#{roleCode},
+			MODIFY_BY=#{userId},
+			MODIFY_TIME=now()
+		where
+			ISSUE_ID=#{issueId}
+	</update>
+	<!-- 新增一条工时记录 -->
+	<insert id="addManHour">
+		insert
+		into
+			I_ISSUE_WORK_LOG
+			( 	LOG_ID,
+   				ISSUE_ID,
+   				WORK_HOURS,
+			    LOG_DATE,
+			    CREATE_BY,
+			    CREATE_TIME,
+			    MODIFY_BY,
+			    MODIFY_TIME
+			 )
+		values
+		(
+			nextval("SEQ_I_ISSUE_WORK_LOG"),
+			#{issueId},
+			#{workHours},
+			#{logDate},
+			#{userId},
+			now(),
+			#{userId},
+			now()
+		)
+	</insert>
+</mapper>

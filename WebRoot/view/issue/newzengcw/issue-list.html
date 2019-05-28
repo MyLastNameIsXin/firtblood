@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>缺陷列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/common/main.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/themes/icon.css">
+    <link rel="stylesheet" href="css/goodso.css">
+    <script type="text/javascript" src="../../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../js/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../../js/common.js"></script>
+    <script type="text/javascript" src="../../gmodule/js/common.js"></script>
+    <script type="text/javascript" src="../../../js/easyui-lang-zh_CN.js"></script>
+    <script src="js/issuelist.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <span><img src="../../../images/common/title.gif">缺陷列表</span>
+        <span>
+            <a id="queryissue" href="javascript:void(0)" class="easyui-linkbutton"
+                data-options="iconCls:'icon-search'">&nbsp;查&nbsp;&nbsp;询&nbsp;</a>
+            <a id="addnewissue" href="javascript:void(0)" class="easyui-linkbutton"
+                data-options="iconCls:'icon-add'">&nbsp;新&nbsp;&nbsp;增&nbsp;</a>
+            <a id="modifynewissue" href="javascript:void(0)" class="easyui-linkbutton"
+                data-options="iconCls:'icon-edit'">&nbsp;修&nbsp;&nbsp;改&nbsp;</a>
+            <a id="deletenewissue" href="javascript:void(0)" class="easyui-linkbutton"
+                data-options="iconCls:'icon-remove'">&nbsp;删&nbsp;&nbsp;除&nbsp;</a>
+        </span>
+    </div>
+
+    <div class="nextheader">
+        <!-- <span class="seacher">&emsp;关键字&nbsp;<input class="easyui-textbox" data-options="prompt:'请输入缺陷名称'" style="width:145px"> 
+        </span> -->
+        <span class="seacher">
+            &emsp;项目&nbsp;<input class="easyui-combobox" id="showProjectName" panelHeight="auto" />
+        </span>
+        <span class="seacher">
+            状态&nbsp;<input class="easyui-combobox" id="showIssueState" panelHeight="auto" >
+        </span>
+        <span class="seacher">
+            创建时间&nbsp;<input id="createDateBefore" type="text" class="easyui-datetimebox"> </input>—
+            <input id="createDateAfter" type="text" class="easyui-datetimebox"> </input>
+        </span>
+    </div>
+
+    
+        <table class="easyui-datagrid" style="width:100%;margin: 0;" data-options="pagination:true" id="showdata">
+            <thead>
+                <tr>
+                    <th data-options="field:'issueName',width:'10%',align:'center'">缺陷名称</th>
+                    <th data-options="field:'projectName',width:'10%',align:'center'">项目名称</th>
+                    <th data-options="field:'priorityDesc',width:'12%',align:'center'">优先级</th>
+                    <th data-options="field:'severityDesc',width:'12%',align:'center'">严重程度</th>
+                    <th data-options="field:'typeDesc',width:'12%',align:'center'">缺陷分类</th>
+                    <th data-options="field:'stateDesc',width:'12%',align:'center'">状态</th>
+                    <th data-options="field:'assignee',width:'10%',align:'center'">指派给</th>
+                    <th data-options="field:'planEndTime',width:'12%',align:'center'">计划完成时间</th>
+                    <th data-options="field:'operation',width:'10%',align:'center',formatter:formaterData">操作</th>
+                </tr>
+            </thead>
+        </table>
+   
+
+
+    <div id="datainfoform" class="easyui-dialog" title="修改" style="width:444px;height:460px;"
+        data-options="iconCls:'icon-save',resizable:false,modal:true,closed:true">
+        <form id="formForAddAndModify" style="line-height: 38px; padding-top: 8px;">
+            <span class="issuelistformspan">项目名称</span><input class="easyui-combobox" data-options="panelHeight:'auto'" style="width:300px" id="showProjectNameByTest" 
+            name="projectId"><br>
+            <span class="issuelistformspan">上级缺陷</span><input class="easyui-combobox" data-options="limitToList:true,panelHeight:'auto'" style="width:300px"
+            name="parentIssueId" id="queryIssueIdByProjectId"><br>
+            <span class="issuelistformspan">缺陷名称</span><input class="easyui-textbox" data-options="" style="width:300px"
+            name="issueName" id="formModifyIssueName"><br>
+            <span style="margin-top: 10px;display: inline-block;">
+                <span class="issuelistformspan">缺陷描述</span><input class="easyui-textbox" data-options="multiline:true" style="width:300px;height: 60px;"
+                name="issueDesc" id="formModifyIssueDesc">
+            </span><br>
+            <span style="margin-top: 16px;display: inline-block;">
+                <span class="issuelistformspan">缺陷要求</span><input class="easyui-textbox" data-options="multiline:true" style="width:300px;height: 60px;"
+                name="doneCondition" id="formModifyDoneCondition">
+            </span><br>
+            <span class="issuelistformspan">缺陷分类</span><input class="easyui-combobox" data-options="panelHeight:'auto'" style="width:102px" id="showIssueType"
+            name="issueType"> 
+            <span class="issuelistformspan">严重程度</span><input class="easyui-combobox" data-options="panelHeight:'auto'" style="width:102px" id="showIssueSeverity"
+            name="issueSeverity"><br>
+            <span class="issuelistformspan">优先级</span><input class="easyui-combobox" data-options="panelHeight:'auto'" style="width:102px" id="showIssuePriority"
+            name="issuePriority">
+            <span class="issuelistformspan">预计工时</span><input class="easyui-textbox" data-options="" style="width:102px"
+            name="planWorkHours" id="formModifyPlanWorkHours"><br>
+            <span class="issuelistformspan">预计开始时间</span><input class="easyui-datebox" data-options="editable:false" style="width:102px" 
+            name="planStartTime" id="formModifyPlanStartTime">
+            <span class="issuelistformspan">预计完成时间</span><input class="easyui-datebox" data-options="editable:false" style="width:102px" 
+            name="planEndTime" id="formModifyPlanEndTime"><br>
+            <a  href="javascript:void(0)" class="easyui-linkbutton"
+                data-options="iconCls:'icon-save'" style="margin-left:320px" id="postInformation">&nbsp;保&nbsp;&nbsp;存&nbsp;</a>
+        </form>
+    </div>
+
+    <div id="moreInfoShow" class="easyui-dialog" title="详细" style="width:600px;height:600px;"   
+        data-options="iconCls:'icon-more',resizable:false,modal:true,closed:true">   
+		<table border="1" style="width: 580px;">
+			<tr style="height:36px;">
+                <td style="width:140px;text-align: right;">项目名称&emsp;</td>
+                <td></td>
+                <td style="width:140px;text-align: right;">上级缺项&emsp;</td>
+                <td></td>
+			</tr>
+            <tr style="height:36px;">
+                <td style="text-align: right;">缺项名称&emsp;</td>
+                <td></td>
+                <td style="text-align: right;">缺项描述&emsp;</td>
+                <td></td>
+            </tr>
+            <tr style="height:36px;">
+                <td style="text-align: right;">缺项分类&emsp;</td>
+                <td></td>
+                <td style="text-align: right;">缺项状态&emsp;</td>
+                <td></td>
+            </tr>
+            <tr style="height:36px;">
+                <td style="text-align: right;">严重程度&emsp;</td>
+                <td></td>
+                <td style="text-align: right;">优先级&emsp;</td>
+                <td></td>
+            </tr>
+            <tr style="height:36px;">
+                <td style="text-align: right;">预计工期&emsp;</td>
+                <td></td>
+                <td style="text-align: right;">完成率&emsp;</td>
+                <td></td>
+            </tr>
+            <tr style="height:36px;">
+                <td style="text-align: right;">计划开始时间&emsp;</td>
+                <td></td>
+                <td style="text-align: right;">计划完成时间&emsp;</td>
+                <td></td>
+            </tr>
+            <tr style="height:72px;" >
+                <td style="text-align: right;">缺陷描述&emsp;</td>
+                <td colspan="3" ><p style="height:64px;"></p></td>
+            </tr>
+            <tr style="height:72px;">
+                <td style="text-align: right;">缺项要求&emsp;</td>
+                <td colspan="3"><p style="height:64px;"></p></td>
+            </tr>
+		</table>
+    </div>  
+</body>
+
+</html>

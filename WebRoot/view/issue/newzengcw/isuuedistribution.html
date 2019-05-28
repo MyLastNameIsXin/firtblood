@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>缺陷分配</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/common/main.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/themes/icon.css">
+    <link rel="stylesheet" href="css/goodso.css">
+    <script type="text/javascript" src="../../../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../js/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="../../../js/common.js"></script>
+    <script type="text/javascript" src="../../gmodule/js/common.js"></script>
+    <script type="text/javascript" src="../../../js/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="js/isuuedistribution.js"></script>
+</head>
+<body>
+    <div class="header">
+        <span><img src="../../../images/common/title.gif">缺陷分配</span>
+        <span>
+            <a id="queryissue" href="javascript:void(0)" class="easyui-linkbutton"
+                data-options="iconCls:'icon-search'">&nbsp;查&nbsp;&nbsp;询&nbsp;</a>
+        </span>
+    </div>
+
+    <div class="nextheader">
+        <span class="seacher">
+            &emsp;项目&nbsp;<input class="easyui-combobox" id="showProjectName" panelHeight="auto" />
+        </span>
+        <span class="seacher">
+            创建时间&nbsp;<input id="createDateBefore" type="text" class="easyui-datetimebox"> </input>—
+            <input id="createDateAfter" type="text" class="easyui-datetimebox"> </input>
+        </span>
+    </div>
+
+    <table class="easyui-datagrid" style="width:100%;margin: 0;" data-options="pagination:true" id="showdata">
+        <thead>
+            <tr>
+                <th data-options="field:'issueName',width:'13%',align:'center'">缺陷名称</th>
+                <th data-options="field:'projectName',width:'13%',align:'center'">项目名称</th>
+                <th data-options="field:'priorityDesc',width:'12%',align:'center'">优先级</th>
+                <th data-options="field:'severityDesc',width:'16%',align:'center'">严重程度</th>
+                <th data-options="field:'typeDesc',width:'16%',align:'center'">缺陷分类</th>
+                <th data-options="field:'planEndTime',width:'16%',align:'center'">计划完成时间</th>
+                <th data-options="field:'operation',width:'14%',align:'center'">操作</th>
+            </tr>
+        </thead>
+    </table>
+</body>
+</html>

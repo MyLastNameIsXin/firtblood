@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>用户管理</title>
+		<meta charset="UTF-8">
+		<meta name="content-type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" href="../../../css/common/main.css" />
+		<link rel="stylesheet" type="text/css" href="../../../css/themes/default/easyui.css">
+		<link rel="stylesheet" type="text/css" href="../../../css/themes/icon.css">
+		<script type="text/javascript" src="../../../js/jquery.min.js"></script>
+		<script type="text/javascript" src="../../../js/jquery.easyui.min.js"></script>
+		<script type="text/javascript" src="../../../js/common.js"></script>
+		<script type="text/javascript" src="../../gmodule/js/common.js"></script>  
+		<script type="text/javascript"	src="js/usercontrl.js" ></script>
+	</head>
+	
+	<body>
+		<table class="btbHead">
+			<tr>
+				<td style='width: 25%;'>
+					<img src='../../../images/common/title.gif' align='absmiddle'/>用户管理 
+				</td>
+				<td style="text-align: right;">
+					<a href="javascript:doUserSearch()" id="searchBtn" class="easyui-linkbutton" iconCls="icon-search">&nbsp;查&nbsp;&nbsp;询&nbsp;</a>
+					<a href="javascript:doAdd()" id="addBtn" class="easyui-linkbutton" iconCls="icon-add">&nbsp;新&nbsp;&nbsp;增&nbsp;</a>
+					<a href="javascript:doModify()" id="modifyBtn" class="easyui-linkbutton" iconCls="icon-edit">&nbsp;修&nbsp;&nbsp;改&nbsp;</a>
+					<a href="javascript:doDelete()" id="deleteBtn" class="easyui-linkbutton" iconCls="icon-remove">&nbsp;删&nbsp;&nbsp;除&nbsp;</a>
+				</td>
+			</tr>
+		</table>
+		<form id="form_search">
+			<table class="btbForm">
+				<tr>
+					<td>
+						关键字&nbsp;<input name="keyWord" class="easyui-textbox" data-options="prompt:'请输入用户编号或姓名'" style="width:150px;"/>
+					</td>
+				</tr>
+			</table>
+		</form>
+		
+		<div style="margin:5px;"></div>
+		
+		<!-- 功能列表 -->
+		<table id="dg" class="easyui-datagrid" style="width:100%;padding:10px;" data-options="pagination:true">
+			<thead>
+				<tr>
+					<!-- <th data-options="field:'cb',checkbox:true,hidden:true"></th> -->
+					<th data-options="field:'userId',halign:'center',sortable:true,alias:'su.user_id'" width="17%">登录账号</th>
+					<th data-options="field:'userName',halign:'center',sortable:true,alias:'su.user_name'" width="16%">用户姓名</th>
+					<th data-options="field:'genderId',align:'center',halign:'center',sortable:true,alias:'su.gender_id'" width="13%" formatter="genderFormatter">性别</th>
+					<th data-options="field:'mobile',halign:'center',sortable:true,alias:'su.mobile'" width="27%">联系方式</th>
+					<th data-options="field:'email',halign:'center',sortable:true,alias:'su.email'" width="27%">电子邮箱</th>
+				</tr>
+			</thead>
+		</table>	
+		
+		<!--修改 、新增面板  -->
+		<div id="dlg_save" style="display:none;overflow:hidden;padding:5px''">
+			<form id="form_save">
+				<table class="btbForm" cellpadding="2px" style="padding-top:10px">
+					<tr>
+						<td style="width: 15%; text-align: right;">
+							登录名称
+						</td>
+						<td style="width:36%">
+							<input  class="easyui-textbox" id="userId" name="userId" style="width:180px;"/>
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 17%; text-align: right;">
+							用户姓名
+						</td>
+						<td>
+							<input  class="easyui-textbox" name="userName" style="width:180px;"/>
+						</td>
+					</tr>
+					
+					<tr>
+						<td style="text-align: right;">
+							性 别
+						</td>
+						<td>
+							<select name="genderId"   class="easyui-combobox" style="width:180px"  data-options="panelHeight:'auto'">
+								<option value="O" select>保密</option>
+								<option value="M">男</option>
+								<option value="F">女</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">
+							移动电话
+						</td>
+						<td>
+							<input  class="easyui-textbox" name="mobile" style="width:180px;"/>
+						</td>
+					</tr>
+					<tr>
+						<td style="text-align: right;">
+							电子邮件
+						</td>
+						<td>
+							<input  class="easyui-textbox" name="email" style="width:180px;"/>
+						</td>
+					</tr>
+					<tr id="yc">
+						<td style="text-align: right;">
+							登录密码
+						</td>
+						<td>
+							<input class="easyui-textbox" name="password" type="password" style="width:180px;" />
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		
+		<!-- 弹出框底部的按钮 -->
+		<div id="btn_dlg" style="display:none;text-align: right;">
+			<a href="javascript:doSave()" class="easyui-linkbutton" iconCls="icon-save">保存</a>
+			<a href="javascript:doCancel()" class="easyui-linkbutton" iconCls="icon-cancel">取消</a>
+		</div>
+	</body>
+</html>

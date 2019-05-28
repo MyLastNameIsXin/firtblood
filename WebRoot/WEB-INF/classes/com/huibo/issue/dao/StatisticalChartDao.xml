@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huibo.issue.dao.StatisticalChartDao">
+	<!-- 缺陷分类占比-->
+	<select id="classificationOf" resultType="com.huibo.issue.po.IssueTypePo">
+	SELECT
+		b.TYPE_DESC typeDesc,
+		COUNT(a.ISSUE_TYPE) branches
+	FROM
+		I_ISSUE_BASE_INFO AS a RIGHT JOIN I_ISSUE_TYPE AS b ON a.ISSUE_TYPE=b.TYPE_CODE
+	WHERE 1=1
+	<if test="startTime!=null and startTime!=''">
+ 			and a.CREATE_TIME &gt; '${startTime}'
+ 		</if>
+		<if test="endTime!=null and endTime!=''">
+ 			and a.CREATE_TIME &lt; '${endTime}'
+		</if>
+ 		<if test="projectId !=null and projectId!='全部' and projectId != '' ">
+ 			and a.PROJECT_ID like "%"#{projectId}"%"
+ 		</if>
+	GROUP BY
+		b.TYPE_DESC
+	</select>
+	<!-- 缺陷状态分布 -->
+	<select id="distribution" resultType="com.huibo.issue.po.IssueStatePo">
+	SELECT
+		b.STATE_DESC stateDesc,
+		COUNT(a.ISSUE_STATE) branches
+	FROM
+	I_ISSUE_BASE_INFO AS a LEFT JOIN I_ISSUE_STATE AS b ON a.ISSUE_STATE=b.STATE_CODE
+	WHERE 1=1
+	<if test="startTime!=null and startTime!=''">
+ 		and a.CREATE_TIME &gt; '${startTime}'
+ 	</if>
+	<if test="endTime!=null and endTime!=''">
+ 		and a.CREATE_TIME &lt; '${endTime}'
+	</if>
+ 	<if test="projectId !=null and projectId!='全部' and projectId != '' ">
+ 		and a.PROJECT_ID like "%"#{projectId}"%"
+ 	</if>
+	GROUP BY
+		b.STATE_DESC
+	</select>
+	<!-- 缺陷严重程度 -->
+	<select id="seriousness" resultType="com.huibo.issue.po.IssueSeverityPo">
+	SELECT
+		b.SEVERITY_DESC severityDesc,
+		COUNT(a.ISSUE_STATE) branches
+	FROM
+		I_ISSUE_BASE_INFO AS a RIGHT JOIN I_ISSUE_SEVERITY AS b ON a.ISSUE_SEVERITY=b.SEVERITY_CODE
+	WHERE
+		1=1
+	<if test="startTime!=null and startTime!=''">
+ 		and a.CREATE_TIME &gt; '${startTime}'
+ 	</if>
+	<if test="endTime!=null and endTime!=''">
+ 		and a.CREATE_TIME &lt; '${endTime}'
+	</if>
+ 	<if test="projectId !=null and projectId!='全部' and projectId != '' ">
+ 		and a.PROJECT_ID like "%"#{projectId}"%"
+ 	</if>
+	GROUP BY 
+		b.SEVERITY_DESC
+	</select>
+	
+	<!-- 缺陷日报 -->
+	<select id="daily" resultType="com.huibo.issue.po.IssueWorkLogPo">
+	SELECT
+		c.PROJECT_NAME projectName,
+		d.USER_NAME userName,
+		a.LOG_DATE logDate,
+		b.ISSUE_NAME issueName,
+		SUM(a.WORK_HOURS) workHours
+	FROM
+		I_ISSUE_WORK_LOG AS a LEFT JOIN I_ISSUE_BASE_INFO AS b ON a.ISSUE_ID=b.ISSUE_ID
+		LEFT JOIN INFO_ISSUE_PROJECT AS c ON b.PROJECT_ID=c.PROJECT_ID
+		LEFT JOIN sys_user AS d ON a.CREATE_BY=d.USER_ID
+	WHERE
+		1=1
+	<if test="params.bo.startTime!=null and params.bo.startTime!=''">
+ 		and a.LOG_DATE &gt;= '${params.bo.startTime}'
+ 	</if>
+	<if test="params.bo.endTime!=null and params.bo.endTime!=''">
+ 		and a.LOG_DATE &lt;= '${params.bo.endTime}'
+	</if>
+ 	<if test="params.bo.projectId !=null and params.bo.projectId != '' ">
+ 		and b.PROJECT_ID like "%"#{params.bo.projectId}"%"
+ 	</if>
+	GROUP BY
+		d.USER_NAME,
+		a.LOG_DATE
+	<if test="params.bo.sort!=null and params.bo.sort!=''">
+		order by ${params.bo.sort}
+		<if test="params.bo.order != null and params.bo.order !=''">
+			${params.bo.order}
+		</if>
+	</if>
+	</select>
+	<!-- 缺陷月报 -->
+	<select id="montyly" resultType="com.huibo.issue.po.IssueWorkLogPo">
+		select * from (
+			SELECT
+				c.PROJECT_NAME projectName,
+				b.ISSUE_NAME issueName,
+				d.USER_NAME userName,
+				b.PROJECT_ID projectId,
+				DATE_FORMAT(a.Log_DATE,"%Y-%m") logDate,
+				SUM(a.WORK_HOURS) workHours
+			FROM
+				I_ISSUE_WORK_LOG AS a LEFT JOIN I_ISSUE_BASE_INFO AS b ON a.ISSUE_ID=b.ISSUE_ID
+				LEFT JOIN INFO_ISSUE_PROJECT AS c ON b.PROJECT_ID=c.PROJECT_ID
+				LEFT JOIN sys_user AS d ON a.CREATE_BY=d.USER_ID
+			where
+				1=1
+			<if test="params.bo.projectId !=null and params.bo.projectId != '' ">
+	 			and b.PROJECT_ID like "%"#{params.bo.projectId}"%"
+	 		</if>
+			GROUP BY
+				b.ISSUE_NAME,
+				logDate
+			) aaa 
+		where 
+			1=1
+		<if test="params.bo.startTime!=null and params.bo.startTime!=''">
+	 		and aaa.logDate &gt;= '${params.bo.startTime}'
+	 	</if>
+		<if test="params.bo.endTime!=null and params.bo.endTime!=''">
+	 		and aaa.logDate &lt;= '${params.bo.endTime}'
+		</if>
+		<if test="params.bo.sort!=null and params.bo.sort!=''">
+			order by ${params.bo.sort}
+			<if test="params.bo.order != null and params.bo.order !=''">
+				${params.bo.order}
+			</if>
+		</if>
+	</select>
+	<!-- 缺陷月报导出 -->
+	<select id="montylyAll" resultType="com.huibo.issue.po.IssueWorkLogPo">
+		select * from (
+			SELECT
+				c.PROJECT_NAME projectName,
+				d.USER_NAME userName,
+				DATE_FORMAT(a.Log_DATE,"%Y-%m") logDate,
+				SUM(a.WORK_HOURS) workHours
+			FROM
+				I_ISSUE_WORK_LOG AS a LEFT JOIN I_ISSUE_BASE_INFO AS b ON a.ISSUE_ID=b.ISSUE_ID
+				LEFT JOIN INFO_ISSUE_PROJECT AS c ON b.PROJECT_ID=c.PROJECT_ID
+				LEFT JOIN sys_user AS d ON a.CREATE_BY=d.USER_ID
+			GROUP BY
+				c.PROJECT_NAME,
+				d.USER_NAME,
+				a.LOG_DATE
+			) aaa 
+		where 
+			1=1
+		<if test=" startTime!=null and startTime!=''">
+	 		and aaa.logDate &gt;= '${startTime}'
+	 	</if>
+		<if test=" endTime!=null and endTime!=''">
+	 		and aaa.logDate &lt;= '${endTime}'
+		</if>
+	 	<if test=" projectId !=null and  projectId != '' ">
+	 		and b.PROJECT_ID=#{projectId}
+	 	</if>
+	</select>
+	<!-- 缺陷日报导出 -->
+	<select id="dailyAll" resultType="com.huibo.issue.po.IssueWorkLogPo">
+	SELECT
+		c.PROJECT_NAME projectName,
+		d.USER_NAME userName,
+		a.LOG_DATE logDate,
+		b.ISSUE_NAME issueName,
+		SUM(a.WORK_HOURS) workHours
+	FROM
+		I_ISSUE_WORK_LOG AS a LEFT JOIN I_ISSUE_BASE_INFO AS b ON a.ISSUE_ID=b.ISSUE_ID
+		LEFT JOIN INFO_ISSUE_PROJECT AS c ON b.PROJECT_ID=c.PROJECT_ID
+		LEFT JOIN sys_user AS d ON a.CREATE_BY=d.USER_ID
+	WHERE
+		1=1
+	<if test=" startTime!=null and  startTime!=''">
+ 		and a.LOG_DATE &gt;= '${startTime}'
+ 	</if>
+	<if test=" endTime!=null and  endTime!=''">
+ 		and a.LOG_DATE &lt;= '${endTime}'
+	</if>
+ 	<if test=" projectId !=null and  projectId != '' ">
+ 		and b.PROJECT_ID=#{projectId}
+ 	</if>
+	GROUP BY
+		d.USER_NAME,
+		a.LOG_DATE
+	</select>
+</mapper>

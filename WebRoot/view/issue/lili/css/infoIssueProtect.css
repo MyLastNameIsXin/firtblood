@@ -1,0 +1,32 @@
+
+.menuTable{
+	width:92%;
+	margin:10px auto 0;
+}
+.menuTable tr{
+	height:40px;
+}
+.menuTable input,.menuTable select{
+	width:176px;
+}
+
+
+#superId{
+	display: inline-block;
+	padding:0 5px 0;
+}
+#protectInfo tr:first-child input{
+	width:142px;
+}
+
+.isid{
+	color:red;
+	padding:3px 4px;
+}
+
+#addRootMenuForm input,#addRootMenuForm select,
+#modifyMenu input,#modifyMenu select,
+#addNextMenu input,#addNextMenu select
+{
+	padding:4px;
+}

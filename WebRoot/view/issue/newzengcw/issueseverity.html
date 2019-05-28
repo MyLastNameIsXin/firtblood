@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>严重程度</title>
+   <link rel="stylesheet" type="text/css" href="../../../css/themes/default/easyui.css">
+		<link rel="stylesheet" type="text/css" href="../../../css/themes/icon.css">
+		<link rel="stylesheet" href="css/goodso.css">
+		<script type="text/javascript" src="../../../js/jquery.min.js"></script>
+		<script type="text/javascript" src="../../../js/jquery.easyui.min.js"></script>
+		<script type="text/javascript" src="../../../js/common.js"></script>
+		<script type="text/javascript" src="../../gmodule/js/common.js"></script> 
+		<script type="text/javascript" src="../../../js/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="js/issueseverity.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <span><img src="../../../images/common/title.gif"> 严重程度管理</span>
+        <span>
+            <a id="add" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add'">&nbsp;新&nbsp;&nbsp;增&nbsp;</a>
+            <a id="modify" href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-edit'" onclick="showModifyWindow()">&nbsp;修&nbsp;&nbsp;改&nbsp;</a>
+            <a id="remove" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">&nbsp;删&nbsp;&nbsp;除&nbsp;</a>
+        </span>
+    </div>
+    <div class="nextheader">
+
+    </div>
+    <div class="next">
+        <table class="easyui-datagrid" id="dataShow" pagination="true"  data-options="singleSelect:true">
+            <thead>
+                <tr>
+                    <th data-options="field:'severityCode',align:'center'" style="width:20%">编号</th>
+                    <th data-options="field:'severityDesc',align:'center'" style="width:30%">严重程度</th>
+                    <th data-options="field:'moduleState',align:'center'" style="width:30%">状态</th>
+                    <th data-options="field:'operation',align:'center'" style="width:20%">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+              
+            </tbody>
+        </table>
+    </div>
+
+        <div id="dd" class="easyui-dialog" title="修改" style="width:400px;height:200px;"
+    data-options="iconCls:'icon-edit',resizable:true,modal:true,closed:true">
+        <form action="" class="modifyform" id="modifyform">
+            <div>
+                <span>编号</span><input class="easyui-textbox"  style="width:300px" name="severityCode" id="inputSeverityCode" data-options="required:true"
+                 validType="existenceModify">
+            </div>
+            <div>
+                <span>严重程度</span><input class="easyui-textbox"  style="width:300px" name="severityDescc" id="inputSeverityDesc" data-options="required:true">
+            </div>
+            <a id="formsure" href="javascript:void(0)" class="easyui-linkbutton"  style="margin: 4px 0px 0 302px;" 
+            data-options="iconCls:'icon-save'">&nbsp;确&nbsp;&nbsp;认&nbsp;</a>
+        </form>
+        </div>  
+
+        <div id="ad" class="easyui-dialog" title="增加" style="width:400px;height:200px;"
+        data-options="iconCls:'icon-add',resizable:true,modal:true,closed:true">
+            <form action="" class="modifyform" id="addform">
+                <div>
+                    <span>编号</span><input class="easyui-textbox"  style="width:300px" name="severityCode" data-options="required:true" id="addInputSeverityCode"
+                    validType="existence">
+                </div>
+                <div>
+                    <span>严重程度</span><input class="easyui-textbox"  style="width:300px" name="severityDescc" data-options="required:true" id="addInputSeverityDesc">
+                </div>
+                <a id="adformsure" href="javascript:void(0)" class="easyui-linkbutton"  style="margin: 4px 0px 0 302px;" 
+                 data-options="iconCls:'icon-save'">&nbsp;确&nbsp;&nbsp;认&nbsp;</a>
+            </form>
+            </div>  
+        
+</body>
+</html>
